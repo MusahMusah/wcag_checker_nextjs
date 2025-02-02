@@ -1,0 +1,178 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: wcag_checker_fe ECS service
+Parameters:
+  ECRImage:
+    Default: us-west-1.amazonaws.com/wcag_checker_fe
+    Type: String
+  VersionTag:
+    Default: latest
+    Type: String
+  ClusterName:
+    Default: wcag_checker_fe-production
+    Type: String
+  ServiceName:
+    Default: wcag_checker_fe
+    Type: String
+  EnvFileS3ARN:
+    Type: String
+Resources:
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      # required by FARGATE
+      Cpu: 2048
+      Memory: 4096
+      ExecutionRoleArn: !Ref ExecutionRole
+      Family: !Sub ${ClusterName}-${ServiceName}
+      # required by FARGATE
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+      ContainerDefinitions:
+        - Name: !Sub ${ClusterName}-${ServiceName}
+          Image: !Sub ${ECRImage}:${VersionTag}
+          PortMappings:
+            - ContainerPort: 3001
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              mode: non-blocking
+              max-buffer-size: 1m
+              awslogs-group: !Ref CloudWatchLogsGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: service
+          Environment:
+            - Name: AWS_REGION
+              Value: !Ref AWS::Region
+            - Name: CLUSTER_NAME
+              Value: !Sub ${ClusterName}
+            - Name: VERSION_TAG
+              Value: !Sub ${VersionTag}
+            - Name: NODE_ENV
+              Value: production
+          EnvironmentFiles:
+            - Type: s3
+              Value: !Sub ${EnvFileS3ARN}
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Policies:
+        - PolicyName: !Sub ${ClusterName}-${ServiceName}-S3Policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Resource:
+                  - !Sub ${EnvFileS3ARN}
+                Action:
+                  - s3:GetObject
+              - Effect: Allow
+                Resource:
+                  - arn:aws:s3:::wcag_checker_fe-internal
+                Action:
+                  - s3:GetBucketLocation
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      # Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  CloudWatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${ClusterName}-${ServiceName}
+      RetentionInDays: 3
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Sub ${ClusterName}-VPC-ID
+      Port: 80
+      Protocol: HTTP
+      Matcher:
+        HttpCode: 200-399
+      # required by FARGATE
+      TargetType: ip
+      HealthCheckIntervalSeconds: 10
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "60"
+        - Key: slow_start.duration_seconds
+          Value: "90"
+      Tags:
+        - Key: StackName
+          Value: !Ref AWS::StackName
+        - Key: Protocol
+          Value: http
+  ServiceHTTPListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    DependsOn:
+      - TargetGroup
+    Properties:
+      ListenerArn:
+        Fn::ImportValue: !Sub ${ClusterName}-B-SERVICE-HTTP-LISTENER
+      Priority: 100
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /*
+      Actions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+  ServiceHTTPSListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    DependsOn:
+      - TargetGroup
+    Properties:
+      ListenerArn:
+        Fn::ImportValue: !Sub ${ClusterName}-B-SERVICE-HTTPS-LISTENER
+      Priority: 100
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /*
+      Actions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+  DaemonService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - ServiceHTTPSListenerRule
+      - ServiceHTTPListenerRule
+    Properties:
+      Cluster:
+        Fn::ImportValue: !Sub ${ClusterName}-CLUSTER
+      ServiceName: !Sub ${ServiceName}
+      TaskDefinition: !Ref TaskDefinition
+      # required by FARGATE
+      DesiredCount: 1
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: !Sub ${ClusterName}-${ServiceName}
+          ContainerPort: 3001
+          TargetGroupArn: !Ref TargetGroup
+      # required by FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets: !Split
+            - ","
+            - Fn::ImportValue: !Sub ${ClusterName}-VPC-PRIVATE-SUBNETS
+          SecurityGroups:
+            - Fn::ImportValue: !Sub ${ClusterName}-ECS-SECURITY-GROUP
+      DeploymentConfiguration:
+        MaximumPercent: 100
+        MinimumHealthyPercent: 0

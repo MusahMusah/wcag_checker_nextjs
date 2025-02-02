@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WCAG Checker
+Ensuring web accessibility is essential for creating inclusive
+digital experiences. With this tool, you can upload an HTML file
+to analyze its compliance with WCAG (Web Content Accessibility
+Guidelines). The system will scan your file for common
+accessibility issues, such as missing alternative text, poor
+keyboard navigation, improper heading structures, and ARIA
+implementation. After the analysis, you&#39;ll receive a detailed
+report with actionable recommendations to improve accessibility,
+helping you build a more inclusive and user-friendly website.
 
-## Getting Started
+## Prerequisites
 
-First, run the development server:
+Ensure you have the following installed before proceeding:
+- [Node.js](https://nodejs.org/) (version 18 or later recommended)
+- [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/), [pnpm](https://pnpm.io/), or [bun](https://bun.sh/) as a package manager
+
+## Installation
+
+Install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Install dependencies
+npm install  # or yarn install, pnpm install, or bun install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Running the Development Server
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To start the development server, run:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev  # or yarn dev, pnpm dev, or bun dev
+```
 
-## Learn More
+Once the server is running, open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+These are required environment variables:
 
-## Deploy on Vercel
+```ini
+NEXT_PUBLIC_API_URL=http://wcag_checker.test
+NEXT_PUBLIC_ENVIRONMENT=
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Building and Running in Production
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To build and run the application in production mode:
+
+```bash
+npm run build  # or yarn build, pnpm build, or bun build
+npm start      # or yarn start, pnpm start, or bun start
+```
+
+The production build will be optimized and served on [http://localhost:3000](http://localhost:3000).
+
+## Linting and Formatting
+
+Run linting and formatting checks with:
+
+```bash
+npm run lint  # Checks for code issues
+npm run format  # Formats code according to the defined rules
+```
+
+## Deployment
+
+This project can be deployed to platforms like Vercel, Netlify, or Docker.
+
+
+### Deploy with Docker
+
+To deploy with Docker, build the image and run it:
+
+```bash
+docker build -t wcag_checker_fe .
+docker run -p 3000:3000 wcag_checker_fe
+```
+
+## Screenshots
+1. Landing Page
+![img.png](img.png)
+2. File Selected
+![img_1.png](img_1.png)
+3. File Processing
+![img_2.png](img_2.png)
+4. Analytics Insights page
+![img_3.png](img_3.png)
+
+---
+
+### Author
+Developed by [Musah Musah](https://github.com/musahmusah).
