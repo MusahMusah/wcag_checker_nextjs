@@ -42,8 +42,8 @@ Once the server is running, open [http://localhost:3000](http://localhost:3000) 
 These are required environment variables:
 
 ```ini
-NEXT_PUBLIC_API_URL=http://wcag_checker.test
-NEXT_PUBLIC_ENVIRONMENT=
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_ENVIRONMENT=development
 ```
 
 ## Building and Running in Production
