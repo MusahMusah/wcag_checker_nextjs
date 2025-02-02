@@ -4,8 +4,8 @@ import { ValidationErrorType } from "@/types/common.type";
 
 class ErrorHandler {
   static handleError(error: IErrorResponse, timer: number = 5000) {
-  console.log(error);
-  
+    console.log(error);
+
     if (error.status === 422) {
       ErrorHandler.handleValidationErrors(error.error!);
     } else {

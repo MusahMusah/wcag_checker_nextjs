@@ -1,4 +1,5 @@
 # WCAG Checker
+
 Ensuring web accessibility is essential for creating inclusive
 digital experiences. With this tool, you can upload an HTML file
 to analyze its compliance with WCAG (Web Content Accessibility
@@ -12,6 +13,7 @@ helping you build a more inclusive and user-friendly website.
 ## Prerequisites
 
 Ensure you have the following installed before proceeding:
+
 - [Node.js](https://nodejs.org/) (version 18 or later recommended)
 - [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/), [pnpm](https://pnpm.io/), or [bun](https://bun.sh/) as a package manager
 
@@ -34,7 +36,6 @@ npm run dev  # or yarn dev, pnpm dev, or bun dev
 ```
 
 Once the server is running, open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
-
 
 ## Environment Variables
 
@@ -69,7 +70,6 @@ npm run format  # Formats code according to the defined rules
 
 This project can be deployed to platforms like Vercel, Netlify, or Docker.
 
-
 ### Deploy with Docker
 
 To deploy with Docker, build the image and run it:
@@ -80,16 +80,18 @@ docker run -p 3000:3000 wcag_checker_fe
 ```
 
 ## Screenshots
+
 1. Landing Page
-![img.png](img.png)
+   ![img.png](img.png)
 2. File Selected
-![img_1.png](img_1.png)
+   ![img_1.png](img_1.png)
 3. File Processing
-![img_2.png](img_2.png)
+   ![img_2.png](img_2.png)
 4. Analytics Insights page
-![img_3.png](img_3.png)
+   ![img_3.png](img_3.png)
 
 ---
 
 ### Author
+
 Developed by [Musah Musah](https://github.com/musahmusah).

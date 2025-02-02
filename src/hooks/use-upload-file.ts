@@ -1,5 +1,5 @@
 import * as React from "react";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 export function useUploadFile(
   endpoint: string,
@@ -14,21 +14,8 @@ export function useUploadFile(
   async function onUpload() {
     setIsUploading(true);
     try {
-      // const res = await uploadFiles(endpoint, {
-      //   ...props,
-      //   files,
-      //   onUploadProgress: ({ file, progress }) => {
-      //     setProgresses((prev) => {
-      //       return {
-      //         ...prev,
-      //         [file]: progress,
-      //       };
-      //     });
-      //   },
-      // });
-      // setUploadedFiles((prev) => (prev ? [...prev, ...res] : res));
     } catch (err) {
-      toast.error(err);
+      toast.error(err as string);
     } finally {
       setProgresses({});
       setIsUploading(false);

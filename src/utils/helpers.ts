@@ -1,3 +1,5 @@
+import { IErrorResponse } from "@/interfaces/common.interface";
+
 const formatAcceptedFileTypes = (accept: Record<string, string[]>): string => {
   const mimeTypes = Object.keys(accept);
   const fileTypes = mimeTypes.map((type) => {
